@@ -418,8 +418,13 @@
         document.getElementById('vc-phone').innerText = phone || 'Phone Number';
         document.getElementById('vc-email').innerText = email || 'Email Address';
 
-        // Set default raw data string
-        const vcardData = ``;
+        // Construct a real vCard standard string using your inputs
+        let vcardData = "";
+        if (name || title || org || phone || email) {
+            vcardData = `BEGIN:VCARD\nVERSION:3.0\nN:${name}\nORG:${org}\nTITLE:${title}\nTEL:${phone}\nEMAIL:${email}\nEND:VCARD`;
+        } else {
+            vcardData = "Type text here to generate QR";
+        }
         
         document.getElementById('dataInput').value = vcardData;
         updateQRCode();
@@ -427,7 +432,6 @@
 
     // Function to update QR code visuals based on settings
     function updateQRCode() {
-        // Build dots options based on solid vs gradient
         let dotsConfig = {
             type: document.getElementById('dotsType').value
         };
@@ -446,10 +450,13 @@
             };
         }
 
+        // Get value directly from textarea to support manual edits
+        const textData = document.getElementById('dataInput').value || " ";
+
         qrCode.update({
             width: parseInt(document.getElementById('size').value),
             height: parseInt(document.getElementById('size').value),
-            data: document.getElementById('dataInput').value,
+            data: textData,
             margin: parseInt(document.getElementById('margin').value),
             image: uploadedLogo,
             qrOptions: {
@@ -487,13 +494,12 @@
         input.addEventListener('input', updateQRCode);
     });
     
-    // Specifically handle checkboxes
     document.getElementById('hideDots').addEventListener('change', updateQRCode);
 
-    // Handle Manual Edits to the Textarea
+    // Handle Manual Edits to the Textarea separately so it won't be wiped out
     document.getElementById('dataInput').addEventListener('input', updateQRCode);
 
-    // Handle Image Upload (Updates both QR Code and Photo Card View)
+    // Handle Image Upload
     document.getElementById('logoInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         const cardLogo = document.getElementById('card-logo-preview');
